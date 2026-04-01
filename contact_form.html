@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+  <!-- 
+    Save locally, push to Github, enable in GitHub Pages
+    THE FORM
+    Each input has an id so JavaScript can find it and read its value.
+    The form itself has an id so JavaScript can listen for the submit event.
+  -->
+  <form id="contactForm">
+    <input id="firstName" name="firstName" placeholder="First Name"><br>
+    <input id="lastName" name="lastName" placeholder="Last Name"><br>
+    <input id="email" name="email" placeholder="Email"><br>
+    <input id="phone" name="phone" placeholder="Phone"><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <!-- 
+    THE OUTPUT AREA
+    This <pre> tag is where the JSON will be displayed after submission.
+    It's empty to start — JavaScript will fill it in.
+    <pre> preserves formatting so the JSON displays neatly.
+  -->
+  <p>What would be sent:</p>
+  <pre id="output"></pre>
+
+  <!-- 
+    THE JAVASCRIPT
+    Everything inside <script> is JavaScript, not HTML.
+    The browser runs this code rather than displaying it.
+  -->
+  <script>
+
+    /*
+      STEP 1: FIND THE FORM AND LISTEN FOR SUBMISSION
+      document is a built-in browser object representing the entire page.
+      getElementById finds the element whose id matches the string you pass in.
+      addEventListener watches the form and runs a function when submit fires.
+      The function receives 'e' — the event object the browser passes in automatically. e is an arbitrary name and references the event listener callback function - an object based on Event describing the event that just happened.
+    */
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+
+      /*
+        STEP 2: STOP THE DEFAULT BEHAVIOR
+        By default, submitting a form reloads the page and sends data
+        as a URL string like ?firstName=Maria&lastName=Santos.
+        preventDefault() cancels that so our JavaScript handles it instead.
+
+      */
+
+      e.preventDefault();
+
+      /*
+        STEP 3: BUILD THE DATA OBJECT
+        Pull the current value out of each input field by its id.
+        The field names on the left (firstName, lastName etc) are our
+        own convention — we chose them. They have to match what the
+        Apps Script expects to receive on the other end.
+      */
+      let data = {
+        firstName: document.getElementById('firstName').value,
+        lastName:  document.getElementById('lastName').value,
+        email:     document.getElementById('email').value,
+        phone:     document.getElementById('phone').value
+      };
+      
+      /*
+        STEP 4: DISPLAY THE JSON ON THE PAGE
+        JSON is a built-in browser object — no import needed.
+        JSON.stringify(value, replacer, space) converts our data object into a JSON text string.
+        The 'null, 2' arguments are just formatting instructions
+        that make the output readable with indentation.
+        innerText sets the visible text content of the <pre> element.
+      */
+
+      document.getElementById('output').innerText = JSON.stringify(data, null, 2);
+
+      /*
+        STEP 5: SEND TO APPS SCRIPT (commented out until ready)
+        When you have a real Apps Script URL, uncomment this block
+        and comment out the display step above.
+        
+        fetch is a built-in browser function for sending HTTP requests.
+        It takes the destination URL and an options object specifying:
+          - method: POST (we are sending data, not requesting it)
+          - body: the JSON string to send as the request payload
+        JSON.stringify here does the same thing as above —
+        converts the data object to text for the journey.
+      */
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxTYJUcjuYPvrwT1-XzPtk6u9lu0Wi9Eky4Wr3FSPBNA7uHNZSzlI1aoV33QG6c3n6xyw/exec';
+
+        fetch(scriptURL, {
+          method: 'POST',
+          body: JSON.stringify(data)
+        })
+        .then(function() {
+          document.getElementById('output').innerText = 'Sent to Apps Script successfully';
+        })
+        .catch(function(error) {
+          document.getElementById('output').innerText = 'Error: ' + error;
+        });
+
+        /* async/await version
+        */
+
+    });
+
+  </script>
+
+</body>
+</html>
+
+
+
+<!--
+**The complete stack this sits in**
+
+Your computer
+  → form.html edited locally in VS Code
+  → git add, git commit, git push
+    → GitHub repository stores the file
+      → GitHub Pages hosts it as a live URL
+        → Browser loads the page, user fills out form
+          → JavaScript builds data object
+            → JSON.stringify converts it to text
+              → [currently] displayed on page for testing
+              → [eventually] fetch sends it to Apps Script
+                → doPost receives and parses it
+                  → createNewContact formats it
+                    → Google Contacts API creates the entry
+-->
