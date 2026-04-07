@@ -100,8 +100,8 @@
           method: 'POST',
           body: formData
         })
-        .then(function() {
-          document.getElementById('output').innerText = 'Sent to Apps Script successfully';
+        .then(function(data) {
+          document.getElementById('output').innerText = 'Sent to Apps Script successfully and created: ' + data.lastName + ", " + data.firstName;
         })
         .catch(function(error) {
           document.getElementById('output').innerText = 'Error: ' + error;
