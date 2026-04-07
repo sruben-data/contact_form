@@ -102,7 +102,7 @@
         })
         .then(response => response.json()) //turn the HTTP response into a JS object, using arrow function syntax
         .then(data =>
-          document.getElementById('output').innerText = 'Sent to Apps Script successfully and created: ' + data.lastName + ", " + data.firstName)
+          document.getElementById('output').innerText = JSON.stringify(data) //'Sent to Apps Script successfully and created: ' + data.lastName + ", " + data.firstName)
         .catch(function(error) {
           document.getElementById('output').innerText = 'Error: ' + error;
         });
