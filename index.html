@@ -100,9 +100,9 @@
           method: 'POST',
           body: formData
         })
-        .then(function(data) {
-          document.getElementById('output').innerText = 'Sent to Apps Script successfully and created: ' + data.lastName + ", " + data.firstName;
-        })
+        .then(response => response.text()) //turn the HTTP response into a string, using arrow function syntax
+        .then(data =>
+          document.getElementById('output').innerText = 'Sent to Apps Script successfully and created: ' + data.lastName + ", " + data.firstName)
         .catch(function(error) {
           document.getElementById('output').innerText = 'Error: ' + error;
         });
