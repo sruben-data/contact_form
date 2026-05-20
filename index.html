@@ -87,29 +87,52 @@
           - body: the form data added to a formData object
           *If sending JSON, would need to send with CORS headers
       */
+      const hostname = location.hostname;
+      let scriptURL;
 
-        const scriptURL_remote = 'https://script.google.com/macros/s/AKfycbxTYJUcjuYPvrwT1-XzPtk6u9lu0Wi9Eky4Wr3FSPBNA7uHNZSzlI1aoV33QG6c3n6xyw/exec';
-        const scriptURL_local = 'http://127.0.0.1:5000/submit'; // Can also be written as localhost:5000/submit
-        
-        const formData = new FormData(); //can also use: const formData = new FormData(document.getElementById('contactForm'));
-        for (const key in data) {
-          formData.append(key, data[key]);
-        }
+      if (['localhost', '127.0.0.1'].includes(hostname)) { 
+        scriptURL = `${location.origin}/submit`; //http://127.0.0.1:5000 = protocol/scheme (http:) + host/domain [hostname (127.0.0.1) + port (5000)] + pathname/path/subdirectory (/submit)
+        // the above uses JS template literals == Python f-strings
+      } else if (hostname === 'sruben-data.github.io') {
+        scriptURL = 'https://script.google.com/macros/s/AKfycbxTYJUcjuYPvrwT1-XzPtk6u9lu0Wi9Eky4Wr3FSPBNA7uHNZSzlI1aoV33QG6c3n6xyw/exec'
+      } else {
+        throw new Error('Unknown hostname: ' + hostname)
+      }
+      
+      const formData = new FormData(); //can also use: const formData = new FormData(document.getElementById('contactForm'));
+      for (const key in data) {
+        formData.append(key, data[key]);
+      }
 
-        fetch(scriptURL_remote, {
-          method: 'POST',
-          body: formData
-        })
-        .then(response => response.json()) //turn the HTTP response into a JS object, using arrow function syntax
-        .then(result =>
-          document.getElementById('output').innerText = JSON.stringify(result)) //'Sent to Apps Script successfully and created: ' + data.lastName + ", " + data.firstName)
-        .catch(function(error) {
-          document.getElementById('output').innerText = 'Error: ' + error;
-        });
+      fetch(scriptURL, {
+        method: 'POST',
+        body: formData
+      }) //This itself is a method call with returns a Promise -> resolves to a Response object: Promise<Response>
+      .then( 
+        response =>
+          response.json()) //turn the HTTP response into a JS object { key: value }, using arrow function syntax - alternative to unnamed functions
+      .then(
+        result =>
+          document.getElementById('output').innerText = JSON.stringify(result)) //stringify the response and put back into the page as the output
+      .catch(
+        error =>
+          document.getElementById('output').innerText = 'Error: ' + error
+      );
 
-        /* async/await version
-        */
-
+      /*
+      async/await version - this uses response.text() to pass the full response output over without modifying
+      fetch(scriptURL_remote, {
+        method: 'POST',
+        body: formData
+      }) //This itself is a method call with returns a Promise -> resolves to a Response object: Promise<Response>
+      .then( 
+        async response =>
+          document.getElementById('output').innerText = await response.text()) //
+      .catch(
+        error =>
+          document.getElementById('output').innerText = 'Error: ' + error
+      );
+      */
     });
 
   </script>
