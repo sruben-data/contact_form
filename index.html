@@ -88,15 +88,15 @@
           *If sending JSON, would need to send with CORS headers
       */
 
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxTYJUcjuYPvrwT1-XzPtk6u9lu0Wi9Eky4Wr3FSPBNA7uHNZSzlI1aoV33QG6c3n6xyw/exec';
-
+        const scriptURL_remote = 'https://script.google.com/macros/s/AKfycbxTYJUcjuYPvrwT1-XzPtk6u9lu0Wi9Eky4Wr3FSPBNA7uHNZSzlI1aoV33QG6c3n6xyw/exec';
+        const scriptURL_local = 'http://127.0.0.1:5000/submit'; // Can also be written as localhost:5000/submit
         
         const formData = new FormData(); //can also use: const formData = new FormData(document.getElementById('contactForm'));
         for (const key in data) {
           formData.append(key, data[key]);
         }
 
-        fetch(scriptURL, {
+        fetch(scriptURL_local, {
           method: 'POST',
           body: formData
         })
